@@ -1,5 +1,6 @@
 package com.dataCopy;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -22,7 +23,16 @@ public class Main {
 	public static JFrame frame;
 	public static final Dimension displaySize = Toolkit.getDefaultToolkit().getScreenSize();
 	
+	JTextArea log;
+	
+	JPanel textAreaPanel;
+	JPanel uiPanel;
+	JPanel buttonPanel;
+	
+	JButton configButton;
+	JButton runButton;
 
+	JProgressBar progressBar;
 	/**
 	 * Launch the application.
 	 */
@@ -56,40 +66,47 @@ public class Main {
 		if (frameSize.width > displaySize.width)  
 			frameSize.width = displaySize.width;
 		frame.setLocation((displaySize.width - frameSize.width) / 2,  
-			(displaySize.height - frameSize.height) / 2);	
-		frame.getContentPane().setLayout(new GridLayout(3, 1, 50, 50));
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.setVisible(true);
+				(displaySize.height - frameSize.height) / 2);
 		
-		JTextArea log = new JTextArea();
+		frame.setResizable(false);
+		
+		textAreaPanel = new JPanel();
+		uiPanel = new JPanel();
+		uiPanel.setLayout(new GridLayout(2, 1));
+		buttonPanel = new JPanel();
+		
+		log = new JTextArea();
 		frame.getContentPane().add(log);
-		log.setColumns(10);
-		log.setRows(4);
+		log.setColumns(39);
+		log.setRows(15);
 		log.setText("操作过程打印...");
 		
+		textAreaPanel.add(log);
 		
-		JPanel panel = new JPanel();
-		frame.getContentPane().add(panel);
-		
-		JButton btnNewButton = new JButton("设置参数");
-		btnNewButton.addActionListener(new ActionListener() {
+		configButton = new JButton("设置参数");
+		configButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Config config = new Config();
-				config.dialog();
+				config.init();
 			}
-		});
+		});		
+		runButton = new JButton("运行");
+		buttonPanel.add(configButton);
+		buttonPanel.add(runButton);
 		
-		
-		JButton btnNewButton_1 = new JButton("运行");
-		panel.add(btnNewButton);
-		panel.add(btnNewButton_1);
-		
-		JProgressBar progressBar = new JProgressBar();
-		progressBar.setSize(400, 10);
-		progressBar.setValue(10);
+		progressBar = new JProgressBar();
+		progressBar.setSize(396, 6);
+		progressBar.setValue(20);
 		progressBar.setStringPainted(true);
-		frame.getContentPane().add(progressBar);
+		
+		uiPanel.add(buttonPanel);
+		uiPanel.add(progressBar);
+		
+		frame.add(textAreaPanel, BorderLayout.CENTER);;
+		frame.add(uiPanel,BorderLayout.SOUTH);
+		
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
 	}
 
 }

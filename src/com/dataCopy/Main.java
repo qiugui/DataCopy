@@ -1,6 +1,7 @@
 package com.dataCopy;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -19,6 +20,9 @@ import javax.swing.JTextArea;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JProgressBar;
 
@@ -39,12 +43,13 @@ public class Main implements ActionListener,Runnable{
 	private JMenuBar jMenuBar;
 	private JMenu startMenu;
 	private JMenu settingMenu;
-	private JMenuItem aboutMenu;
+	private JMenu helpMenu;
 	private JMenuItem runMenuItem;
 	private JMenuItem exitMenuItem;
 	private JMenuItem connMenuItem;
 	private JMenuItem timingMenuItem;
 	private JMenuItem userinfoMenuItem;
+	private JMenuItem aboutMenuItem;
 	
 	//“日志”组件信息
 	private JScrollPane logPane;
@@ -102,12 +107,43 @@ public class Main implements ActionListener,Runnable{
 		exitMenuItem.addActionListener(this);
 		connMenuItem = new JMenuItem("连接参数设置");
 		connMenuItem.addActionListener(this);
-		timingMenuItem = new JMenuItem("定时任务参数");
+		timingMenuItem = new JMenuItem("设置定时任务");
+		timingMenuItem.addActionListener(this);
 		userinfoMenuItem = new JMenuItem("用户信息设置");
+		userinfoMenuItem.addActionListener(this);
+		aboutMenuItem = new JMenuItem("关于");
+		aboutMenuItem.addActionListener(this);
 		startMenu = new JMenu("开始");
+		startMenu.addMouseListener(new MouseAdapter() {
+	            public void mouseEntered(MouseEvent e) {
+	            	startMenu.setForeground(Color.red);
+	            }
+	 
+	            public void mouseExited(MouseEvent e) {
+	            	startMenu.setForeground(Color.black);
+	            }
+		});
 		settingMenu = new JMenu("设置");
-		aboutMenu = new JMenuItem("关于");
-		aboutMenu.addActionListener(this);
+		settingMenu.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+            	settingMenu.setForeground(Color.red);
+            }
+ 
+            public void mouseExited(MouseEvent e) {
+            	settingMenu.setForeground(Color.black);
+            }
+	});
+		helpMenu = new JMenu("帮助");
+		helpMenu.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+            	helpMenu.setForeground(Color.red);
+            }
+ 
+            public void mouseExited(MouseEvent e) {
+            	helpMenu.setForeground(Color.black);
+            }
+	});
+
 		jMenuBar = new JMenuBar();
 		startMenu.add(runMenuItem);
 		startMenu.addSeparator();
@@ -115,9 +151,10 @@ public class Main implements ActionListener,Runnable{
 		settingMenu.add(connMenuItem);
 		settingMenu.add(timingMenuItem);
 		settingMenu.add(userinfoMenuItem);
+		helpMenu.add(aboutMenuItem);
 		jMenuBar.add(startMenu);
 		jMenuBar.add(settingMenu);
-		jMenuBar.add(aboutMenu);
+		jMenuBar.add(helpMenu);
 		frame.setJMenuBar(jMenuBar);
 
 		log = new JTextArea();
@@ -147,18 +184,27 @@ public class Main implements ActionListener,Runnable{
 	 */
 	 
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("连接参数设置")){
-			ConfigJFrame configJFrame = new ConfigJFrame();
-			configJFrame.createJDialog();
-		}
 		
 		if (e.getActionCommand().equals("立即运行")){
 			System.out.println("运行...");
 		}
 		
 		if (e.getActionCommand().equals("退出")){
-			//frame.dispose();
+			frame.dispose();
 			System.exit(0);
+		}
+		
+		if (e.getActionCommand().equals("连接参数设置")){
+			ConfigJFrame configJFrame = new ConfigJFrame();
+			configJFrame.createJDialog();
+		}
+		
+		if (e.getActionCommand().equals("设置定时任务")){
+			TimingJFrame timingJFrame = new TimingJFrame();
+		}
+		
+		if (e.getActionCommand().equals("用户信息设置")){
+			UsersettingJFrame usersettingJFrame = new UsersettingJFrame();
 		}
 		
 		if (e.getActionCommand().equals("关于")){
@@ -178,4 +224,5 @@ public class Main implements ActionListener,Runnable{
 			}
 		}
 	}
+
 }

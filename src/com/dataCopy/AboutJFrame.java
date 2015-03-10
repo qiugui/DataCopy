@@ -8,8 +8,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 public class AboutJFrame implements ActionListener{
 	
@@ -17,7 +17,7 @@ public class AboutJFrame implements ActionListener{
 	
 	private JPanel panel;
 	private JPanel buttonPanel;
-	private JLabel infoLabel;
+	private JTextArea aboutTextArea;
 	private JButton okButton;
 	
 	public AboutJFrame(){
@@ -33,11 +33,18 @@ public class AboutJFrame implements ActionListener{
 	public void initialize(){
 		panel = new JPanel(new BorderLayout());
 		buttonPanel = new JPanel();
-		infoLabel = new JLabel("关于");
+		aboutTextArea = new JTextArea();
+		aboutTextArea.setLineWrap(true);
+		aboutTextArea.setEditable(false);
+		aboutTextArea.setText("\t关于\n");
+		aboutTextArea.append("\n    Version Beta1.0\n");
+		aboutTextArea.append("\n    功能：将更新过的数据进行迁移\n");
+		aboutTextArea.append("\n    日期：2015年03月10日");
+		
 		okButton = new JButton("确定");
 		okButton.addActionListener(this);
 		buttonPanel.add(okButton);
-		panel.add(infoLabel, BorderLayout.CENTER);
+		panel.add(aboutTextArea, BorderLayout.CENTER);
 		panel.add(buttonPanel, BorderLayout.SOUTH);
 		jDialog.add(panel);
 	}

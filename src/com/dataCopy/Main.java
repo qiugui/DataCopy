@@ -86,8 +86,8 @@ public class Main {
 		configButton = new JButton("设置参数");
 		configButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Config config = new Config();
-				config.init();
+				ConfigJFrame configJFrame = new ConfigJFrame();
+				configJFrame.createJDialog();
 			}
 		});		
 		runButton = new JButton("运行");

@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import java.awt.GridLayout;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 
@@ -18,24 +19,29 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JProgressBar;
 
-public class Main {
+/** 
+* @ClassName: Main 
+* @Description: 主程序
+* @author qiugui 
+* @date 2015年3月10日 下午12:01:07 
+*  
+*/ 
+public class Main implements ActionListener{
 
 	public static JFrame frame;
 	public static final Dimension displaySize = Toolkit.getDefaultToolkit().getScreenSize();
 	
-	JTextArea log;
+	//“日志”组件信息
+	private JScrollPane logPane;
+	private JTextArea log;
 	
-	JPanel textAreaPanel;
-	JPanel uiPanel;
-	JPanel buttonPanel;
-	
-	JButton configButton;
-	JButton runButton;
+	//“UI”组件信息
+	private JPanel uiPanel;
+	private JPanel buttonPanel;
+	private JButton configButton;
+	private JButton runButton;
+	private JProgressBar progressBar;
 
-	JProgressBar progressBar;
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -48,49 +54,46 @@ public class Main {
 		});
 	}
 
-	/**
-	 * Create the application.
-	 */
-	public Main() {
-		initialize();
-	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		//设置JFrame的属性
+	/**   
+	 * @Title:  Main   
+	 * @Description:  JFrame设置      
+	 */  
+	 
+	public Main() {
 		frame = new JFrame("数据库同步");
 		frame.setSize(450, 300);
 		Dimension frameSize = frame.getSize();
 		if (frameSize.width > displaySize.width)  
 			frameSize.width = displaySize.width;
-		frame.setLocation((displaySize.width - frameSize.width) / 2,  
-				(displaySize.height - frameSize.height) / 2);
-		
+		frame.setLocation((displaySize.width-frameSize.width)/2,(displaySize.height-frameSize.height)/2);
 		frame.setResizable(false);
+		this.initialize();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
+	}
+
+
+	/**   
+	 * @Title: initialize   
+	 * @Description: 初始化JFrame布局          
+	 */
+	 
+	private void initialize() {
+		//初始化组件信息
+		log = new JTextArea();
+		log.setColumns(38);
+		log.setRows(12);
+		log.setText("操作过程打印...");
+		logPane = new JScrollPane(log);
 		
-		textAreaPanel = new JPanel();
 		uiPanel = new JPanel();
 		uiPanel.setLayout(new GridLayout(2, 1));
 		buttonPanel = new JPanel();
-		
-		log = new JTextArea();
-		frame.getContentPane().add(log);
-		log.setColumns(39);
-		log.setRows(15);
-		log.setText("操作过程打印...");
-		
-		textAreaPanel.add(log);
-		
 		configButton = new JButton("设置参数");
-		configButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ConfigJFrame configJFrame = new ConfigJFrame();
-				configJFrame.createJDialog();
-			}
-		});		
+		configButton.addActionListener(this);		
 		runButton = new JButton("运行");
+		runButton.addActionListener(this);
 		buttonPanel.add(configButton);
 		buttonPanel.add(runButton);
 		
@@ -102,11 +105,27 @@ public class Main {
 		uiPanel.add(buttonPanel);
 		uiPanel.add(progressBar);
 		
-		frame.add(textAreaPanel, BorderLayout.CENTER);;
+		frame.add(logPane, BorderLayout.CENTER);;
 		frame.add(uiPanel,BorderLayout.SOUTH);
+
+	}
+
+	/**   
+	 * <p>Title: actionPerformed</p>   
+	 * <p>Description: 监听事件</p>   
+	 * @param e   
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)   
+	 */
+	 
+	public void actionPerformed(ActionEvent e) {
+		if (e.getActionCommand().equals("设置参数")){
+			ConfigJFrame configJFrame = new ConfigJFrame();
+			configJFrame.createJDialog();
+		}
 		
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
+		if (e.getActionCommand().equals("运行")){
+			System.out.println("运行...");
+		}
 	}
 
 }

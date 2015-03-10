@@ -48,7 +48,7 @@ import javax.swing.SwingConstants;
 	private JPasswordField exportPassword;
 	
 	//显示导出数据表 组件
-	JScrollPane tablePanel;
+	JScrollPane tablePane;
 	JTextArea tableTextArea;
 	
 	//“设置自动运行时间”组件信息
@@ -83,7 +83,7 @@ import javax.swing.SwingConstants;
 		 Dimension dialogSize = jDialog.getSize();
 		 jDialog.setLocation((Main.displaySize.width-dialogSize.width)/2,(Main.displaySize.height-dialogSize.height)/2);
 		 jDialog.setResizable(false);
-		 this.init();
+		 this.initialize();
 		 jDialog.setVisible(true);		 
 	 }
 	 
@@ -92,7 +92,7 @@ import javax.swing.SwingConstants;
 	 * @Description: 初始化JDialog的布局           
 	 */
 	 
-	public void init(){
+	public void initialize(){
 		 //初始化组件信息
 		importLabel = new JLabel("导入数据库配置");
 		importIPLabel = new JLabel("IP地址");
@@ -132,7 +132,7 @@ import javax.swing.SwingConstants;
 		
 		tableTextArea = new JTextArea();
 		tableTextArea.setSize(220, 125);
-		tablePanel = new JScrollPane(tableTextArea);
+		tablePane = new JScrollPane(tableTextArea);
 		
 		uiPanel = new JPanel(new GridLayout(5, 1));
 		time1Panel = new JPanel();
@@ -213,7 +213,7 @@ import javax.swing.SwingConstants;
 		jDialog.add(importPassword);
 		jDialog.add(exportPasswordLabel);
 		jDialog.add(exportPassword);
-		jDialog.add(tablePanel);
+		jDialog.add(tablePane);
 		jDialog.add(uiPanel);
 		
 		//定义一个GridBagConstraints，用来控制添加进的组件的显示位置
@@ -275,7 +275,7 @@ import javax.swing.SwingConstants;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridwidth = 2;
 		gbc.weighty = 1;
-		layout.setConstraints(tablePanel, gbc);
+		layout.setConstraints(tablePane, gbc);
 		gbc.gridwidth = 0;
 		gbc.weighty = 0;
 		layout.setConstraints(uiPanel, gbc);

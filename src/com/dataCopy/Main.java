@@ -171,6 +171,7 @@ public class Main implements ActionListener,Runnable{
 
 		log = new JTextArea();
 		log.setText("操作过程打印...");
+		log.setEditable(false);
 		logPane = new JScrollPane(log);
 		
 		runInfoPanel = new JPanel();

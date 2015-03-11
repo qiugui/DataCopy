@@ -13,7 +13,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
- public class UsersettingJFrame implements ActionListener{
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+ public class UsersettingJFrame implements ActionListener, CaretListener{
 
 	 private JDialog jDialog = new JDialog(Main.frame, "用户信息设置", ModalityType.APPLICATION_MODAL);
 	
@@ -27,9 +29,10 @@ import javax.swing.JTextField;
 	 private JPasswordField confirmPassword;
 	 private JPanel buttonPanel;
 	 private JButton okButton;
+	 private JButton cancelButton;
 	 
 	 public UsersettingJFrame() {
-		 jDialog.setSize(200, 175);
+		 jDialog.setSize(200, 150);
 		 Dimension dialogSize = jDialog.getSize();
 		 jDialog.setLocation((Main.displaySize.width-dialogSize.width)/2,(Main.displaySize.height-dialogSize.height)/2);
 		 jDialog.setResizable(false);
@@ -44,16 +47,24 @@ import javax.swing.JTextField;
 		//初始化控件信息
 		 usernameLabel = new JLabel("用户名");
 		 usernameTextField = new JTextField(10);
+		 usernameTextField.addCaretListener(this);
 		 oldPasswordLabel = new JLabel("原密码");
 		 oldPassword = new JPasswordField(10);
+		 oldPassword.addCaretListener(this);
 		 newPasswordLabel = new JLabel("新密码");
 		 newPassword = new JPasswordField(10);
+		 newPassword.addCaretListener(this);
 		 confirmPasswordLabel = new JLabel("确认密码");
 		 confirmPassword = new JPasswordField(10);
+		 confirmPassword.addCaretListener(this);
+		 
 		 buttonPanel = new JPanel();
-		 okButton = new JButton("确认修改");
+		 okButton = new JButton("确认");
 		 okButton.addActionListener(this);
+		 cancelButton = new JButton("取消");
+		 cancelButton.addActionListener(this);
 		 buttonPanel.add(okButton);
+		 buttonPanel.add(cancelButton);
 		 
 		GridBagLayout layout = new GridBagLayout();
 		jDialog.setLayout(layout);
@@ -100,9 +111,27 @@ import javax.swing.JTextField;
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		 if(e.getActionCommand().equals("确认修改")){
+		 if(e.getActionCommand().equals("确认")){
 			 jDialog.dispose();
 		 }
+		 if(e.getActionCommand().equals("取消")){
+			 jDialog.dispose();
+		 }
+	}
+
+	public void caretUpdate(CaretEvent e) {
+		if(e.getSource().equals(usernameTextField)){
+			System.out.println("用户名被更改");
+		}
+		if(e.getSource().equals(oldPassword)){
+			System.out.println("旧被更改");
+		}
+		if(e.getSource().equals(newPassword)){
+			System.out.println("新密码被更改");
+		}
+		if(e.getSource().equals(confirmPassword)){
+			System.out.println("确认密码被更改");
+		}
 	}
 
 }

@@ -3,7 +3,6 @@ package com.dataCopy;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
@@ -17,12 +16,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.JProgressBar;
 
@@ -36,7 +35,6 @@ import javax.swing.JProgressBar;
 public class Main implements ActionListener,Runnable{
 
 	public static JFrame frame;
-	private static Thread thread;
 	public static final Dimension displaySize = Toolkit.getDefaultToolkit().getScreenSize();
 	
 	//“菜单”组件信息
@@ -51,6 +49,9 @@ public class Main implements ActionListener,Runnable{
 	private JMenuItem userinfoMenuItem;
 	private JMenuItem aboutMenuItem;
 	
+	//数据库信息
+	private MydatabaseLabel databaseLabel;
+	
 	//“日志”组件信息
 	private JScrollPane logPane;
 	private JTextArea log;
@@ -58,28 +59,31 @@ public class Main implements ActionListener,Runnable{
 	//“UI”组件信息
 	private JPanel runInfoPanel;
 	private JLabel stateLabel;
-	private JProgressBar progressBar;
+	private JProgressBar progressBar;  
+	 
+	private class MydatabaseLabel extends JLabel implements Runnable {
 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
+		private static final long serialVersionUID = 1L;
+
+		public void run() {
+			for (int i=1;i<=3;i++){
 				try {
-					Main window = new Main();
-					thread = new Thread(window);
-					thread.start();
-				} catch (Exception e) {
-					e.printStackTrace();
+					Thread.sleep(300);
+				} catch (InterruptedException e) {
+					 e.printStackTrace();
+				}
+				if (i==1) {
+					databaseLabel.setForeground(Color.green);
+				} else if (i==2) {
+					databaseLabel.setForeground(Color.blue);
+				} else {
+					databaseLabel.setForeground(Color.red);
+					i=0;	
 				}
 			}
-		});
+		}
 	}
-
-
-	/**   
-	 * @Title:  Main   
-	 * @Description:  JFrame设置      
-	 */  
-	 
+	
 	public Main() {
 		frame = new JFrame("数据库同步");
 		frame.setSize(450, 300);
@@ -150,6 +154,7 @@ public class Main implements ActionListener,Runnable{
 		startMenu.add(exitMenuItem);
 		settingMenu.add(connMenuItem);
 		settingMenu.add(timingMenuItem);
+		settingMenu.addSeparator();
 		settingMenu.add(userinfoMenuItem);
 		helpMenu.add(aboutMenuItem);
 		jMenuBar.add(startMenu);
@@ -157,20 +162,26 @@ public class Main implements ActionListener,Runnable{
 		jMenuBar.add(helpMenu);
 		frame.setJMenuBar(jMenuBar);
 
+		databaseLabel = new MydatabaseLabel();
+		databaseLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		databaseLabel.setForeground(Color.red);
+		databaseLabel.setText("当前数据库为：Mart库 --- MartJS库");
+		Thread thread = new Thread(databaseLabel);
+		thread.start();
+
 		log = new JTextArea();
-		log.setColumns(38);
-		log.setRows(12);
 		log.setText("操作过程打印...");
 		logPane = new JScrollPane(log);
 		
 		runInfoPanel = new JPanel();
 		runInfoPanel.setLayout(new GridLayout(2, 1));
-		stateLabel = new JLabel("正在运行中...");
+		stateLabel = new JLabel("即将运行");
 		progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
 		runInfoPanel.add(progressBar);
 		runInfoPanel.add(stateLabel);
 		
+		frame.add(databaseLabel,BorderLayout.NORTH);
 		frame.add(logPane, BorderLayout.CENTER);;
 		frame.add(runInfoPanel,BorderLayout.SOUTH);
 
@@ -200,27 +211,32 @@ public class Main implements ActionListener,Runnable{
 		}
 		
 		if (e.getActionCommand().equals("设置定时任务")){
-			TimingJFrame timingJFrame = new TimingJFrame();
+			new TimingJFrame();
 		}
 		
 		if (e.getActionCommand().equals("用户信息设置")){
-			UsersettingJFrame usersettingJFrame = new UsersettingJFrame();
+			new UsersettingJFrame();
 		}
 		
 		if (e.getActionCommand().equals("关于")){
-			AboutJFrame aboutJFrame = new AboutJFrame();
+			new AboutJFrame();
 		}
 		
 	}
 
 	public void run() {
-		System.out.println("进入线程");
 		for (int i=0;i<=100; i++) {
+			if(i==1){
+				stateLabel.setText("正在运行中...");
+			}
 			progressBar.setValue(i);
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+			}
+			if(i==100){
+				stateLabel.setText("运行结束！");
 			}
 		}
 	}

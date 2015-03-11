@@ -1,5 +1,6 @@
  package com.dataCopy;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -22,6 +23,8 @@ import javax.swing.JTextField;
 	 private static JFrame jFrame;
 	 public static final Dimension displaySize = Toolkit.getDefaultToolkit().getScreenSize();
 	 
+	 private JPanel jPanel;
+	 
 	 private Mypanel imagePanel;
 	 private JLabel loginLabel;
 	 private JTextField loginTextField;
@@ -36,7 +39,7 @@ import javax.swing.JTextField;
 	 
 	 public Login() {
 		jFrame = new JFrame("登陆");
-		jFrame.setSize(275, 200);
+		jFrame.setSize(300, 200);
 		Dimension jFrameSize = jFrame.getSize();
 		if (jFrameSize.width > displaySize.width)  
 			jFrameSize.width = displaySize.width;
@@ -50,25 +53,26 @@ import javax.swing.JTextField;
 
 	private void initialize() {
 		//初始化组件
+		 jPanel = new JPanel();
 		 imagePanel = new Mypanel();
 		 loginLabel = new JLabel("用户名");
 		 loginTextField = new JTextField(10);
-		 passwordLabel = new JLabel("密  码");
+		 passwordLabel = new JLabel("密    码");
 		 passwordField = new JPasswordField(10);
 		 keeppasswordCheckBox = new JCheckBox("记住密码");
 		 okButton = new JButton("登陆");
 		 okButton.addActionListener(this);
 		 
 		 GridBagLayout layout = new GridBagLayout();
-		 jFrame.setLayout(layout);
+		 jPanel.setLayout(layout);
 		 
-		 jFrame.add(imagePanel);
-		 jFrame.add(loginLabel);
-		 jFrame.add(loginTextField);
-		 jFrame.add(passwordLabel);
-		 jFrame.add(passwordField);
-		 jFrame.add(keeppasswordCheckBox);
-		 jFrame.add(okButton);
+		 jPanel.add(imagePanel);
+		 jPanel.add(loginLabel);
+		 jPanel.add(loginTextField);
+		 jPanel.add(passwordLabel);
+		 jPanel.add(passwordField);
+		 jPanel.add(keeppasswordCheckBox);
+		 jPanel.add(okButton);
 		 
 		 GridBagConstraints gbc = new GridBagConstraints();
 		 gbc.fill = GridBagConstraints.BOTH;
@@ -93,6 +97,10 @@ import javax.swing.JTextField;
 		 layout.setConstraints(keeppasswordCheckBox, gbc);
 		 gbc.gridwidth = 0;
 		 layout.setConstraints(okButton, gbc);
+		 
+		 jFrame.add(new JPanel(),BorderLayout.WEST);
+		 jFrame.add(jPanel,BorderLayout.CENTER);
+		 jFrame.add(new JPanel(),BorderLayout.EAST);
 	}
 	
 	class Mypanel extends JPanel {

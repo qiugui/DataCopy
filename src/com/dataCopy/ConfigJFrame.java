@@ -96,7 +96,7 @@ import javax.swing.event.CaretListener;
 		importPortLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		importUsernameLabel = new JLabel("用户名");
 		importUsernameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		importPasswordLabel = new JLabel("密码");
+		importPasswordLabel = new JLabel("密    码");
 		importPasswordLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		importIPText = new JTextField(10);
@@ -117,7 +117,7 @@ import javax.swing.event.CaretListener;
 		exportPortLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		exportUsernameLabel = new JLabel("用户名");
 		exportUsernameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		exportPasswordLabel = new JLabel("密码");
+		exportPasswordLabel = new JLabel("密    码");
 		exportPasswordLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		exportIPText = new JTextField(10);

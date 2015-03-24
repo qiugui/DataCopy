@@ -35,9 +35,10 @@ import com.topit.datacopy.utils.SqlUtil;
 			 String[] updatedInfoPrimaryKeyvalues = updatedInfo.getPrimarykeyvalue().split("&");
 			 String conditions = "";
 			 for (int j=0;j<updatedInfoPrimaryKeys.length;j++){
-				 String condition = updatedInfoPrimaryKeys[j]+"='"+updatedInfoPrimaryKeyvalues[j]+"' ";
+				 String condition = updatedInfoPrimaryKeys[j]+"='"+updatedInfoPrimaryKeyvalues[j]+"' AND ";
 				 conditions +=condition;
 			 }
+			 conditions = conditions.substring(0,conditions.length()-4);
 			 if ("UPDATE".equals(updatedInfo.getOperation())){
 				 sql = "UPDATE "+updatedInfo.getTablename()+" SET "
 						 +updatedInfo.getColumn()+"=Convert("+updatedInfo.getColumntype()+",'"+updatedInfo.getNewvalue()

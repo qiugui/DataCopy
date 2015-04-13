@@ -148,7 +148,7 @@ public class TestCase {
 
 	 @Test
 	 public void test5() throws Exception{
-		 SqlUtil.getInsertedRecord("dbo.cltype", "typeno='STT' ");
+		 SqlUtil.getInsertedRecords("dbo.cltypep", "colth = 'SSW'");
 	 }
 	 
 	 @Test

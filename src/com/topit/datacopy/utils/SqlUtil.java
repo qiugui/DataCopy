@@ -72,12 +72,12 @@ public class SqlUtil {
 	 
 	/**   
 	 * @Title: getInsertedRecord   
-	 * @Description: 查询被插入的记录   
+	 * @Description: 根据主键，查询被插入的记录，返回一条插入记录   
 	 * @param tablename 被插入的表名
 	 * @param condition 主键条件       
 	 * @throws Exception 
 	 */
-	 
+/*	 
 	public static List<Map<String, String>> getInsertedRecord(String tablename,String condition) throws Exception{
 		init();
 		 s_connection = DBUtils.getDBConnection(Constants.DBConnection.SOURCEDB);
@@ -106,7 +106,46 @@ public class SqlUtil {
 			close(rs, ps, s_connection);
 		}
 	}
+	*/
 	
+	/**   
+	 * @Title: getInsertedRecords   
+	 * @Description: 根据某一条件，查询被插入的记录，返回多条插入记录   
+	 * @param tablename
+	 * @param condition        
+	 */
+	 
+	public static List<List<Map<String, String>>> getInsertedRecords(String tablename,String condition) throws Exception{
+		init();
+		 s_connection = DBUtils.getDBConnection(Constants.DBConnection.SOURCEDB);
+		 try {
+			 List<List<Map<String, String>>> allResults = new ArrayList<List<Map<String,String>>>();
+			 String sql = "SELECT * FROM "+tablename+" WHERE "+condition;
+			 ps = s_connection.prepareStatement(sql);
+			 rs = ps.executeQuery();
+			 ResultSetMetaData rsmd = rs.getMetaData();
+			 int numberOfColumns = rsmd.getColumnCount();
+			 while(rs.next()){
+				 List<Map<String, String>> results = new ArrayList<Map<String,String>>();
+				 for (int i=1;i<=numberOfColumns;i++){
+				    	Map<String, String> result = new HashMap<String, String>();
+				    	String nameOfColumn = rsmd.getColumnName(i);
+				    	String valueOfColumn = rs.getString(i);
+				    	String typeOfColumn = rsmd.getColumnTypeName(i);
+				    	result.put("nameOfColumn", nameOfColumn);
+				    	result.put("valueOfColumn", valueOfColumn);
+				    	result.put("typeOfColumn", typeOfColumn);
+				    	results.add(result);
+				    }
+				 allResults.add(results);
+			 }
+			 return allResults;
+		 }catch(Exception e){ 
+				throw new RuntimeException(e);
+			}finally {
+				close(rs, ps, s_connection);
+			}
+	}
 	
 	/**   
 	 * @Title: updata   

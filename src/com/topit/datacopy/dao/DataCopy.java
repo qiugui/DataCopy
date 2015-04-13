@@ -14,6 +14,7 @@ public class DataCopy {
 	private static int updateNum = 0;
 	private UpdatedInfo updatedInfo;
 	private List<String> sqls = new ArrayList<String>();
+	List<List<Map<String, String>>> insertedRecords;
 
 	public DataCopy() throws Exception {
 		updatedInfos = SqlUtil.getUpdatedInfo();
@@ -29,9 +30,7 @@ public class DataCopy {
 	public void updateTargetDB() throws Exception {
 		for (int i = 0; i < updateNum; i++) {
 			updatedInfo = updatedInfos.get(i);
-			String sql = "";// 插入前先删除的逻辑
-			String del_sql = "";
-			List<Map<String, String>> insertedRecord = new ArrayList<Map<String, String>>();
+			String sql = "";
 			String[] updatedInfoPrimaryKeys = updatedInfo.getPrimarykey()
 					.split("&");
 			String[] updatedInfoPrimaryKeyvalues = updatedInfo
@@ -43,44 +42,64 @@ public class DataCopy {
 				conditions += condition;
 			}
 			conditions = conditions.substring(0, conditions.length() - 4);
-			if ("UPDATE".equals(updatedInfo.getOperation())) {
-				sql = "UPDATE " + updatedInfo.getTablename() + " SET "
-						+ updatedInfo.getColumn() + "=Convert("
-						+ updatedInfo.getColumntype() + ",'"
-						+ updatedInfo.getNewvalue() + "') WHERE " + conditions;
-			} else if ("INSERT".equals(updatedInfo.getOperation())) {
-				insertedRecord = SqlUtil.getInsertedRecord(
-						updatedInfo.getTablename(), conditions);
-				String insertedColumn = "";
-				String insertedValue = "";
-				for (int k = 0; k < insertedRecord.size(); k++) {
-					HashMap<String, String> record = (HashMap<String, String>) insertedRecord
-							.get(k);
-					String valueOfColumn = record.get("valueOfColumn");
-					String nameOfColumn = record.get("nameOfColumn");
-					String typeOfColumn = record.get("typeOfColumn");
-					if (valueOfColumn != null) {
-						insertedColumn += nameOfColumn + ",";
-						insertedValue += "Convert(" + typeOfColumn + ",'"
-								+ valueOfColumn + "'),";
-					}
-				}
-
-				del_sql = "delete from " + updatedInfo.getTablename()
-						+ " where " + conditions;
+			if("dbo.cltypep".equals(updatedInfo.getTablename())){
+				insertedRecords = SqlUtil.getInsertedRecords("dbo.cltypep", "colthno = 'SSW'");
+				String del_sql = "DELETE FROM dbo.cltypep WHERE colthno = 'SSW'";
 				sqls.add(del_sql);
-				sql = "INSERT INTO "
-						+ updatedInfo.getTablename()
-						+ " ("
-						+ insertedColumn.substring(0,
-								insertedColumn.length() - 1)
-						+ ") VALUES ("
-						+ insertedValue
-								.substring(0, insertedValue.length() - 1) + ")";
+				addSqls(updatedInfo.getTablename(),insertedRecords,"colthno = 'SSW'");
+			} else {
+				if ("UPDATE".equals(updatedInfo.getOperation())) {
+					sql = "UPDATE " + updatedInfo.getTablename() + " SET "
+							+ updatedInfo.getColumn() + "=Convert("
+							+ updatedInfo.getColumntype() + ",'"
+							+ updatedInfo.getNewvalue() + "') WHERE " + conditions;
+					sqls.add(sql);
+				} else if ("INSERT".equals(updatedInfo.getOperation())) {
+					insertedRecords = SqlUtil.getInsertedRecords(updatedInfo.getTablename(), conditions);
+					addSqls(updatedInfo.getTablename(), insertedRecords, conditions);
+				}
 			}
-
-			sqls.add(sql);
+			
 		}
 		SqlUtil.updata(sqls);
 	}
+
+	private void addSqls(String tablename,List<List<Map<String, String>>> insertedRecords,String conditions) {
+		List<Map<String, String>> insertedRecord = new ArrayList<Map<String, String>>();
+		String del_sql = "";
+		String sql = "";
+		for (int i = 0; i < insertedRecords.size(); i++){
+			insertedRecord = insertedRecords.get(i);
+			String insertedColumn = "";
+			String insertedValue = "";
+			for (int k = 0; k < insertedRecord.size(); k++) {
+				HashMap<String, String> record = (HashMap<String, String>) insertedRecord
+						.get(k);
+				String valueOfColumn = record.get("valueOfColumn");
+				String nameOfColumn = record.get("nameOfColumn");
+				String typeOfColumn = record.get("typeOfColumn");
+				if (valueOfColumn != null) {
+					insertedColumn += nameOfColumn + ",";
+					insertedValue += "Convert(" + typeOfColumn + ",'"
+							+ valueOfColumn + "'),";
+				}
+			}
+			// 插入前先删除的逻辑
+			if (!"dbo.cltypep".equals(tablename)){
+				del_sql = "DELETE FROM " + tablename
+						+ " WHERE " + conditions;
+				sqls.add(del_sql);
+			}
+			sql = "INSERT INTO "
+					+ tablename
+					+ " ("
+					+ insertedColumn.substring(0,
+							insertedColumn.length() - 1)
+					+ ") VALUES ("
+					+ insertedValue
+							.substring(0, insertedValue.length() - 1) + ")";
+			sqls.add(sql);
+		}
+	}
+
 }

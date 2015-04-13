@@ -43,16 +43,17 @@ public class DataCopy {
 			}
 			conditions = conditions.substring(0, conditions.length() - 4);
 			if("dbo.cltypep".equals(updatedInfo.getTablename())){
-				insertedRecords = SqlUtil.getInsertedRecords("dbo.cltypep", "colthno = 'SSW'");
-				String del_sql = "DELETE FROM dbo.cltypep WHERE colthno = 'SSW'";
+				String condition = "colthno = '"+updatedInfoPrimaryKeyvalues[1]+"'";
+				insertedRecords = SqlUtil.getInsertedRecords("dbo.cltypep",condition );
+				String del_sql = "DELETE FROM dbo.cltypep WHERE "+condition;
 				sqls.add(del_sql);
-				addSqls(updatedInfo.getTablename(),insertedRecords,"colthno = 'SSW'");
+				addSqls(updatedInfo.getTablename(),insertedRecords,condition);
 			} else {
 				if ("UPDATE".equals(updatedInfo.getOperation())) {
 					sql = "UPDATE " + updatedInfo.getTablename() + " SET "
 							+ updatedInfo.getColumn() + "=Convert("
 							+ updatedInfo.getColumntype() + ",'"
-							+ updatedInfo.getNewvalue() + "') WHERE " + conditions;
+							+ (updatedInfo.getNewvalue()==null?' ':updatedInfo.getNewvalue()) + "') WHERE " + conditions;
 					sqls.add(sql);
 				} else if ("INSERT".equals(updatedInfo.getOperation())) {
 					insertedRecords = SqlUtil.getInsertedRecords(updatedInfo.getTablename(), conditions);

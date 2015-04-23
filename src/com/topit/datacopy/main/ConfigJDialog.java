@@ -19,6 +19,7 @@ import javax.swing.SwingConstants;
 import com.topit.datacopy.config.ConnectConfig;
 import com.topit.datacopy.config.Constants;
 import com.topit.datacopy.manager.ConfigManager;
+import com.topit.datacopy.utils.SqlUtil;
 
 public class ConfigJDialog extends JDialog implements ActionListener{
 	 
@@ -257,6 +258,7 @@ public class ConfigJDialog extends JDialog implements ActionListener{
 		try {
 			sourceDB_temp = ConfigManager.getDBConfig(Constants.DBConnection.SOURCEDB);
 			targetDB_temp = ConfigManager.getDBConfig(Constants.DBConnection.TARGETDB);
+			SqlUtil.init();
 		} catch (Exception e) {
 			Constants.logger.error("初始化数据库信息失败！"+e.getMessage(), e);
 			JOptionPane.showMessageDialog(this, "初始化数据库信息失败！请联系管理员！", "提示", JOptionPane.ERROR_MESSAGE);

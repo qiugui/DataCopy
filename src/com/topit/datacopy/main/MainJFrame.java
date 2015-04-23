@@ -35,11 +35,13 @@ import java.util.List;
 
 import javax.swing.JProgressBar;
 
+
 import com.topit.datacopy.config.AutoTask;
 import com.topit.datacopy.config.Constants;
 import com.topit.datacopy.manager.AutoTaskManager;
 import com.topit.datacopy.manager.ConfigManager;
 import com.topit.datacopy.utils.SqlUtil;
+
 
 /** 
 * @ClassName: Main 
@@ -326,6 +328,9 @@ public class MainJFrame extends JFrame implements ActionListener{
 		if (e.getActionCommand().equals("结束运行")){
 			if(!"当前状态：定时任务".equals(stateLabel.getText())){
 				SqlUtil._interrupted = true;
+				/*ThreadPool.getThreadPool().destroy(true);*/
+				/*MainJFrame.stateLabel.setText("当前状态：定时任务");
+				MainJFrame.progressBar.setValue(0);*/
 			} else {
 				JOptionPane.showMessageDialog(this, "非运行状态，无需中断！", "警告", JOptionPane.WARNING_MESSAGE);
 			}

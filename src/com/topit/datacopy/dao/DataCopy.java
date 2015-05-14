@@ -20,7 +20,8 @@ public class DataCopy {
 	private static int updateNum = 0;
 	private static int dboCltypeNewNum = 0;
 	private static int dboCltypebNewNum = 0;
-	public static final String DBOCLTYPEP = "martjs.cltypepcopy";
+	private static int dboCltypepNewNum=0;
+	public static final String DBOCLTYPEP = "dbo.cltypep";
 	private int batchSize = 100;
 	private int operateNum = 0;
 	private int currentIndex = 0;
@@ -29,7 +30,7 @@ public class DataCopy {
 	private List<List<Map<String, String>>> insertedRecords;
 	private List<List<Map<String, String>>> dboCltypeNewInsertedRecords;
 	private List<List<Map<String, String>>> dboCltypebNewInsertedRecords;
-
+	private List<List<Map<String, String>>> dboCltypepNewInsertedRecords;
 	public DataCopy() throws Exception {
 		updatedInfos = SqlUtil.getUpdatedInfo();
 		updateNum = updatedInfos.size();
@@ -39,8 +40,8 @@ public class DataCopy {
 	 * @throws Exception
 	 * @Title: updateTargetDB
 	 * @Description: 对目标数据库进行更新\插入
-	 */
-
+	 */                                   
+	 
 	public void updateTargetDB() throws Exception {
 
 		/*
@@ -50,13 +51,16 @@ public class DataCopy {
 		dboCltypeNewNum = dboCltypeNewInsertedRecords.size();
 		dboCltypebNewInsertedRecords = SqlUtil.getInsertedRecords("dbo.cltypeb_new", "1=1");
 		dboCltypebNewNum = dboCltypebNewInsertedRecords.size();
-		
-		operateNum = updateNum + dboCltypeNewNum + dboCltypebNewNum;
+		/**
+		 * 对dbo.cltypep进行时间段的增量拷贝
+		 */
+		dboCltypepNewInsertedRecords=SqlUtil.getInsertedRecords(DBOCLTYPEP, "  gxrq > '"+Constants.lastCopyTime+"'");
+		dboCltypepNewNum=dboCltypepNewInsertedRecords.size();
+		operateNum = updateNum + dboCltypeNewNum + dboCltypebNewNum+dboCltypepNewNum;
 		
 		sqls.add("DELETE FROM dbo.cltype_new WHERE 1=1");
 		for (int k = 0; k < dboCltypeNewNum; k++){
-			currentIndex++;
-			
+			currentIndex++;			
 			addSql("dbo.cltype_new", dboCltypeNewInsertedRecords.get(k), "1=1");
 			if(sqls.size() > batchSize || k == (dboCltypeNewNum-1))
 			{  
@@ -66,7 +70,6 @@ public class DataCopy {
 				DBUtils.shutDownDataSource();
 				return;
 			}
-
 			MainJFrame.progressBar.setValue((int)( ((double)currentIndex / (double)operateNum) * 100));
 		}
 		
@@ -84,7 +87,22 @@ public class DataCopy {
 			}
 			MainJFrame.progressBar.setValue((int)( ((double)currentIndex / (double)operateNum) * 100));
 		}
-		
+		/**
+		 * 增量复制cltypep的记录
+		 */
+		for (int  m= 0; m < dboCltypepNewNum; m++){
+			currentIndex++;
+			addSql(DBOCLTYPEP, dboCltypepNewInsertedRecords.get(m), "1=1");
+			if(sqls.size() > batchSize || m == (dboCltypepNewNum-1))
+			{  
+				batchUpdate();
+			}
+			if(SqlUtil._interrupted) {
+				DBUtils.shutDownDataSource();
+				return;
+			}
+			MainJFrame.progressBar.setValue((int)( ((double)currentIndex / (double)operateNum) * 100));
+		}
 		for (int i = 0; i < updateNum; i++) {
 			currentIndex++;
 			updatedInfo = updatedInfos.get(i);
@@ -100,11 +118,11 @@ public class DataCopy {
 			}
 			String conditions=buf.substring(0, buf.length()-4);
 			if(DBOCLTYPEP.equals(updatedInfo.getTablename())){	
-				String condition = "colthno = '"+updatedInfoPrimaryKeyvalues[1]+"'";
+				/*String condition = "colthno = '"+updatedInfoPrimaryKeyvalues[1]+"'";
 				insertedRecords = SqlUtil.getInsertedRecords(DBOCLTYPEP,condition );
 				String del_sql = "DELETE FROM " + DBOCLTYPEP + " WHERE "+condition;
 				sqls.add(del_sql);
-				addSqls(updatedInfo.getTablename(),insertedRecords,condition);
+				addSqls(updatedInfo.getTablename(),insertedRecords,condition);*/
 			} else {
 				if ("UPDATE".equals(updatedInfo.getOperation())) {
 					sql = "UPDATE " + updatedInfo.getTablename() + " SET "
@@ -130,7 +148,7 @@ public class DataCopy {
 			}
 		}
 		//删除updateInfo
-		//SqlUtil.deleteAll("martjs.updated_info");
+		SqlUtil.deleteAll("martjs.updated_info");
 		
 		DBUtils.shutDownDataSource();
 		
@@ -159,11 +177,13 @@ public class DataCopy {
 	}
 
 	private void addSql(String tablename,
-			List<Map<String, String>> insertedRecord, String conditions) {
+			List<Map<String, String>> insertedRecord, String conditions) {		
 		String del_sql = "";
 		String sql = "";
 		StringBuffer insertedColumn = new StringBuffer("");
 		StringBuffer insertedValue = new StringBuffer("");
+		//cltypep安主键删除的条件语句
+		StringBuffer del_conditions=new StringBuffer("");
 		for (int k = 0; k < insertedRecord.size(); k++) {
 			HashMap<String, String> record = (HashMap<String, String>) insertedRecord
 					.get(k);
@@ -174,7 +194,16 @@ public class DataCopy {
 				insertedColumn.append(nameOfColumn + ",");
 				insertedValue .append("Convert(" + typeOfColumn + ",'"
 						+ valueOfColumn + "'),");
+				if(DBOCLTYPEP.equals(tablename))
+				{			
+					if("typeno".equals(nameOfColumn)||"colthno".equals(nameOfColumn)||"color".equals(nameOfColumn))
+					{
+						del_conditions.append(nameOfColumn+" = "+"Convert(" + typeOfColumn + ",'"
+								+ valueOfColumn + "')  AND ");
+					}
+				}
 			}
+			
 		}
 		// 插入前先删除的逻辑
 		if (!DBOCLTYPEP.equals(tablename) && !"dbo.cltype_new".equals(tablename) 
@@ -182,7 +211,14 @@ public class DataCopy {
 			del_sql = "DELETE FROM " + tablename
 					+ " WHERE " + conditions;
 			sqls.add(del_sql);
+		}else if(DBOCLTYPEP.equals(tablename)){
+			//对cltypep进行先删除再插入
+			del_sql = "DELETE FROM " + tablename
+					+ " WHERE " + del_conditions.substring(0, del_conditions.toString().lastIndexOf("AND"));
+			sqls.add(del_sql);		
 		}
+		
+		
 		sql = "INSERT INTO "
 				+ tablename
 				+ " ("

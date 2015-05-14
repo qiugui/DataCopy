@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configs>
 <sourcedb>
-<ip>172.24.241.199</ip>
-<port>51990</port>
-<dbname>zbmarttest</dbname>
+<ip>172.24.241.3</ip>
+<port>50000</port>
+<dbname>zbmart</dbname>
 <user>martjs</user>
-<password>martjs</password>
+<password>martjs4.21</password>
 </sourcedb>
 <targetdb>
-<ip>172.24.241.199</ip>
-<port>51990</port>
-<dbname>zbmartjstest</dbname>
+<ip>172.24.241.21</ip>
+<port>51000</port>
+<dbname>zbmartjs</dbname>
 <user>martjs</user>
-<password>martjs</password>
+<password>martjs4.21</password>
 </targetdb>
 <autoruntimes>
 <autoruntime1>10:30</autoruntime1>
@@ -23,4 +23,5 @@
 <username>admin</username>
 <password>e10adc3949ba59abbe56e057f20f883e</password>
 </loginUser>
+<lastCopyTime></lastCopyTime>
 </configs>

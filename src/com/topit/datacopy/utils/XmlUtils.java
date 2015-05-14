@@ -37,7 +37,7 @@ public class XmlUtils {
 	private DocumentBuilder getBuilder() throws Exception {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
-	
+
 		builder = factory.newDocumentBuilder();
 		return builder;
 
@@ -46,64 +46,66 @@ public class XmlUtils {
 	// 初始化构建xml文件
 	public void createXml() throws Exception {
 
-			file.createNewFile();
-			Document document = getBuilder().newDocument();
+		file.createNewFile();
+		Document document = getBuilder().newDocument();
 
-			// 创建根节点
-			Element root = document.createElement(Constants.ROOT);
-			document.appendChild(root);
+		// 创建根节点
+		Element root = document.createElement(Constants.ROOT);
+		document.appendChild(root);
 
-			/* 创建一个完成的节点，sourcedb */
-			Element sourcedb = document
-					.createElement(Constants.DBConnection.SOURCEDB);
-			sourcedb.appendChild(document
-					.createElement(Constants.DBConnection.IP));
-			sourcedb.appendChild(document
-					.createElement(Constants.DBConnection.PORT));
-			sourcedb.appendChild(document
-					.createElement(Constants.DBConnection.DBNAME));
-			sourcedb.appendChild(document
-					.createElement(Constants.DBConnection.USER));
-			sourcedb.appendChild(document
-					.createElement(Constants.DBConnection.PASSWORD));
-			root.appendChild(sourcedb);
+		/* 创建一个完成的节点，sourcedb */
+		Element sourcedb = document
+				.createElement(Constants.DBConnection.SOURCEDB);
+		sourcedb.appendChild(document.createElement(Constants.DBConnection.IP));
+		sourcedb.appendChild(document
+				.createElement(Constants.DBConnection.PORT));
+		sourcedb.appendChild(document
+				.createElement(Constants.DBConnection.DBNAME));
+		sourcedb.appendChild(document
+				.createElement(Constants.DBConnection.USER));
+		sourcedb.appendChild(document
+				.createElement(Constants.DBConnection.PASSWORD));
+		root.appendChild(sourcedb);
 
-			/* 创建第二个节点，targetdb */
-			Element targetdb = document
-					.createElement(Constants.DBConnection.TARGETDB);
-			targetdb.appendChild(document
-					.createElement(Constants.DBConnection.IP));
-			targetdb.appendChild(document
-					.createElement(Constants.DBConnection.PORT));
-			targetdb.appendChild(document
-					.createElement(Constants.DBConnection.DBNAME));
-			targetdb.appendChild(document
-					.createElement(Constants.DBConnection.USER));
-			targetdb.appendChild(document
-					.createElement(Constants.DBConnection.PASSWORD));
-			root.appendChild(targetdb);
+		/* 创建第二个节点，targetdb */
+		Element targetdb = document
+				.createElement(Constants.DBConnection.TARGETDB);
+		targetdb.appendChild(document.createElement(Constants.DBConnection.IP));
+		targetdb.appendChild(document
+				.createElement(Constants.DBConnection.PORT));
+		targetdb.appendChild(document
+				.createElement(Constants.DBConnection.DBNAME));
+		targetdb.appendChild(document
+				.createElement(Constants.DBConnection.USER));
+		targetdb.appendChild(document
+				.createElement(Constants.DBConnection.PASSWORD));
+		root.appendChild(targetdb);
 
-			/* 创建第三个节点，autoruntimes */
-			Element autoruntimes = document
-					.createElement(Constants.AutoTask.AUTORUNTIMES);
-			autoruntimes.appendChild(document
-					.createElement(Constants.AutoTask.AUTORUNTIME1));
-			autoruntimes.appendChild(document
-					.createElement(Constants.AutoTask.AUTORUNTIME2));
-			autoruntimes.appendChild(document
-					.createElement(Constants.AutoTask.AUTORUNTIME3));
-			root.appendChild(autoruntimes);
+		/* 创建第三个节点，autoruntimes */
+		Element autoruntimes = document
+				.createElement(Constants.AutoTask.AUTORUNTIMES);
+		autoruntimes.appendChild(document
+				.createElement(Constants.AutoTask.AUTORUNTIME1));
+		autoruntimes.appendChild(document
+				.createElement(Constants.AutoTask.AUTORUNTIME2));
+		autoruntimes.appendChild(document
+				.createElement(Constants.AutoTask.AUTORUNTIME3));
+		root.appendChild(autoruntimes);
 
-			/* 创建第四个节点，users */
-			Element user = document.createElement(Constants.User.USER);
-			user.appendChild(document.createElement(Constants.User.USERNAME));
-			user.appendChild(document.createElement(Constants.User.PASSWORD));
-			root.appendChild(user);
+		/* 创建第四个节点，users */
+		Element user = document.createElement(Constants.User.USER);
+		user.appendChild(document.createElement(Constants.User.USERNAME));
+		user.appendChild(document.createElement(Constants.User.PASSWORD));
+		root.appendChild(user);
 
-			writeDom2File(document);
+		/**
+		 * 创建第五个节点 lastCopyTime
+		 */
+		Element time = document.createElement(Constants.LastCopyTimeNode);
+		root.appendChild(time);
+		writeDom2File(document);
 
 	}
-	
 
 	// 将DOM对象document写入到xml文件中
 	private void writeDom2File(Document doc) throws Exception {
@@ -119,41 +121,42 @@ public class XmlUtils {
 			pw = new PrintWriter(fio);
 			StreamResult result = new StreamResult(pw);
 			transformer.transform(new DOMSource(doc), result); // 关键转换
-		}finally {
+		} finally {
 			fio.close();
 			pw.close();
 		}
 	}
 
 	public Element getElementByTag(String tagName) throws Exception {
-			if (!file.exists()) {
-				createXml();
-			}
-			// 通过DocumentBuilder创建doc的文档对象
-			Document docs = getBuilder().parse(file);
-			// 创建XPath
-			XPath xPath = XPathFactory.newInstance().newXPath();
-			NodeList nodeList = (NodeList) xPath.evaluate("//" + tagName, docs,
-					XPathConstants.NODESET);
-			Element element = (Element) nodeList.item(0);
-			return element;
+		if (!file.exists()) {
+			createXml();
+		}
+		// 通过DocumentBuilder创建doc的文档对象
+		Document docs = getBuilder().parse(file);
+		// 创建XPath
+		XPath xPath = XPathFactory.newInstance().newXPath();
+		NodeList nodeList = (NodeList) xPath.evaluate("//" + tagName, docs,
+				XPathConstants.NODESET);
+		Element element = (Element) nodeList.item(0);
+		return element;
 	}
-	
-	public void updateXML(String parentTag, String targetTag, String tagetValue) throws Exception {
 
-			if (!file.exists()) {
-				createXml();
-			}
-			Document doc = getBuilder().parse(file);
-			doc.normalize();
-			XPath xPath = XPathFactory.newInstance().newXPath();
-			NodeList nodeList = (NodeList) xPath.evaluate("//" + parentTag,
-					doc, XPathConstants.NODESET);
-			Element parent = (Element) nodeList.item(0);
-			Element target = (Element) parent.getElementsByTagName(targetTag)
-					.item(0);
-			target.setTextContent(tagetValue);
-			writeDom2File(doc);
+	public void updateXML(String parentTag, String targetTag, String tagetValue)
+			throws Exception {
+
+		if (!file.exists()) {
+			createXml();
+		}
+		Document doc = getBuilder().parse(file);
+		doc.normalize();
+		XPath xPath = XPathFactory.newInstance().newXPath();
+		NodeList nodeList = (NodeList) xPath.evaluate("//" + parentTag, doc,
+				XPathConstants.NODESET);
+		Element parent = (Element) nodeList.item(0);
+		Element target = (Element) parent.getElementsByTagName(targetTag).item(
+				0);
+		target.setTextContent(tagetValue);
+		writeDom2File(doc);
 
 	}
 

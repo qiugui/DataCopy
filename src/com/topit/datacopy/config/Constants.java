@@ -1,6 +1,11 @@
 package com.topit.datacopy.config;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import org.apache.log4j.Logger;
+
+import com.topit.datacopy.utils.XmlUtils;
 
 /**
  * 
@@ -11,24 +16,61 @@ import org.apache.log4j.Logger;
  *
  */
 public class Constants {
-	
+
 	public static Logger logger = Logger.getLogger(Constants.class);
-	
+	/**
+	 * 上次同步的时间
+	 */
+	public static String lastCopyTime = "";
+	static {
+		XmlUtils xmlUtils = new XmlUtils();
+		try {
+			String temp=xmlUtils.getElementByTag(Constants.LastCopyTimeNode).getTextContent();
+			if(temp.trim()=="")
+			{
+				Calendar c = Calendar.getInstance();
+				c.add(Calendar.DAY_OF_MONTH, -1);
+				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+				String mDateTime = formatter.format(c.getTime());
+				lastCopyTime =  mDateTime + " 00:00:00";
+			}else {
+				lastCopyTime=temp;
+			}
+						
+		} catch (Exception e) {
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.DAY_OF_MONTH, -1);
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String mDateTime = formatter.format(c.getTime());
+			lastCopyTime =mDateTime + " 00:00:00";
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 本次同步的时间
+	 */
+	public static String currentCopyTime = "";
 	public static boolean isRunning = false;
-	/** 
-	* @Fields loginUsername : 登陆用户的用户名
-	*/ 
+	/**
+	 * @Fields loginUsername : 登陆用户的用户名
+	 */
 	public static String loginUsername;
-	
-	/** 
-	* @Fields taskName : 改程序的任务名
-	*/ 
+
+	/**
+	 * @Fields taskName : 改程序的任务名
+	 */
 	public static String taskName = "请设置任务名称！";
-	
+
 	/**
 	 * 配置文件的根节点
 	 */
 	public static final String ROOT = "configs";
+	/**
+	 * 上次跟新的时间
+	 */
+	public static final String LastCopyTimeNode = "lastCopyTime";
 
 	/**
 	 * 

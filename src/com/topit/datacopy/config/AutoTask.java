@@ -12,6 +12,7 @@ import org.quartz.impl.JobDetailImpl;
 import com.topit.datacopy.dao.DataCopy;
 import com.topit.datacopy.main.MainJFrame;
 import com.topit.datacopy.utils.SqlUtil;
+import com.topit.datacopy.utils.XmlUtils;
 
 /**
  * 
@@ -25,7 +26,8 @@ public class AutoTask implements Job {
 
 	SimpleDateFormat format = new SimpleDateFormat(
 			"yyyy/MM/dd HH:mm:ss.SSS");
-	
+	private XmlUtils utils=new XmlUtils();
+
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
 
@@ -37,6 +39,8 @@ public class AutoTask implements Job {
 				dataCopy = new DataCopy();
 				MainJFrame.log.removeAll();
 				dataCopy.updateTargetDB();
+				Constants.lastCopyTime=Constants.currentCopyTime;
+				utils.updateXML(Constants.ROOT, Constants.LastCopyTimeNode, Constants.lastCopyTime);
 			} catch (Exception e) {
 				Constants.logger.error("拷贝数据库出现错误！" + e.getMessage(), e);
 				MainJFrame.log.append("\n拷贝数据库出现错误！\n");

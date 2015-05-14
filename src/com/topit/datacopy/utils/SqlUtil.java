@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +32,6 @@ public class SqlUtil {
 	private static PreparedStatement ps;
 	private static ResultSet rs;
 	public static boolean _interrupted = false;
-
 	public static double currentIndex = 0;
 
 	public static void init() throws Exception {
@@ -90,6 +91,7 @@ public class SqlUtil {
 		}
 	}
 
+	
 	/**
 	 * @Title: getInsertedRecords
 	 * @Description: 根据某一条件，查询被插入的记录，返回多条插入记录
@@ -105,6 +107,10 @@ public class SqlUtil {
 			String sql = "SELECT * FROM " + tablename + " WHERE " + condition;
 			ps = s_connection.prepareStatement(sql);
 			rs = ps.executeQuery();
+			if(DataCopy.DBOCLTYPEP.equals(tablename))
+			{	    
+			    getDBcurrentTime();
+			}
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int numberOfColumns = rsmd.getColumnCount();
 			while (rs.next()) {
@@ -127,6 +133,39 @@ public class SqlUtil {
 		} finally {
 			close(rs, ps, s_connection);
 		}
+	}
+    /**
+     * 
+     * @Title: getDBcurrentTime   
+     * @Description: 获取数据库的当前时间   
+     * @param s_connection
+     */
+	private static void getDBcurrentTime() throws Exception{
+		Connection s_connection = DBUtils.getDBConnection(Constants.DBConnection.SOURCEDB);
+		//记录上本次查询时间，也即是本次同步的时间
+		SimpleDateFormat format = new SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss.SSS");
+		String date="";
+		String queryTime="select getdate()  currenTime";//获取当前数据库的时间
+		PreparedStatement pstime = null;
+		ResultSet timers=null;
+		try {
+			pstime = s_connection.prepareStatement(queryTime);
+			 timers=pstime.executeQuery();
+			while(timers.next())
+			{
+			   date=timers.getString("currenTime");
+			}
+			long time=format.parse(date).getTime()-1000*60*3;
+			Constants.currentCopyTime=format.format(new Date(time));
+		} catch (SQLException e) {
+			 e.printStackTrace();
+			 
+		}finally{
+			close(timers, pstime, s_connection);
+		}
+	
+	   
 	}
 
 	/**
